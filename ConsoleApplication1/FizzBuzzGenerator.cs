@@ -1,30 +1,29 @@
-﻿using System.Text;
+using System.Text;
 
-namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+/// <summary>
+/// fizz-buzz generator
+/// </summary>
+public class FizzBuzzGenerator : IOutputGenerator
 {
-    /// <summary>
-    /// fizz-buzz generator
-    /// </summary>
-    public class FizzBuzzGenerator : IOutputGenerator
+    private readonly IRange _range;
+
+    public FizzBuzzGenerator(IRange range)
     {
-        private readonly IRange _range;
+        _range = range;
+    }
 
-        public FizzBuzzGenerator(IRange range)
+    public string GenerateOutput()
+    {
+        var builder = new StringBuilder();
+        for (var i = _range.Lower; i < _range.Upper; i++)
         {
-            _range = range;
+            if (i % 6 == 0) builder.Append("fizzbuzz ");
+            else if (i % 3 == 0) builder.Append("buzz ");
+            else if (i % 2 == 0) builder.Append("fizz ");
+            else builder.AppendFormat("{0} ", i);
         }
-
-        public string GenerateOutput()
-        {
-            var builder = new StringBuilder();
-            for (var i = _range.Lower; i < _range.Upper; i++)
-            {
-                if (i % 6 == 0) builder.Append("fizzbuzz ");
-                else if (i % 3 == 0) builder.Append("buzz ");
-                else if (i % 2 == 0) builder.Append("fizz ");
-                else builder.AppendFormat("{0} ", i);
-            }
-            return builder.ToString();
-        }
+        return builder.ToString();
     }
 }

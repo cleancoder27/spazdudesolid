@@ -1,35 +1,20 @@
-﻿using System;
-using Castle.Windsor;
+using ConsoleApplication1;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace ConsoleApplication1
+var services = new ServiceCollection();
+services.AddGenerators();
+var provider = services.BuildServiceProvider();
+
+do
 {
-    class Program
+    IOutputGenerator? generator = Console.ReadLine() switch
     {
-        private static void Main(string[] args)
-        {
-            using (var container = new WindsorContainer())
-            {
-                container.Install(new AppInstaller());
-                do
-                {
-                    IOutputGenerator myClass;
-                    switch (Console.ReadLine())
-                    {
-                        case "1":
-                            myClass = container.Resolve<ReverseEvenNumberGenerator>();
-                            break;
-                        case "2":
-                            myClass = container.Resolve<Class1>();
-                            break;
-                        case "3":
-                            myClass = container.Resolve<OddNumberGenerator>();
-                            break;
-                        default:
-                            return;
-                    }
-                    Console.WriteLine(myClass.GenerateOutput());
-                } while (true);
-            }
-        }
-    }
-}
+        "1" => provider.GetRequiredService<ReverseEvenNumberGenerator>(),
+        "2" => provider.GetRequiredService<Class1>(),
+        "3" => provider.GetRequiredService<OddNumberGenerator>(),
+        _ => null
+    };
+
+    if (generator is null) break;
+    Console.WriteLine(generator.GenerateOutput());
+} while (true);

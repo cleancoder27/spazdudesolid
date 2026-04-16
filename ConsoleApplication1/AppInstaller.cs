@@ -1,29 +1,28 @@
-using Castle.MicroKernel.Registration;
-using Castle.MicroKernel.SubSystems.Configuration;
-using Castle.Windsor;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace ConsoleApplication1
+namespace ConsoleApplication1;
+
+/// <summary>
+/// The registration details of this example are not significant to the solution
+/// </summary>
+public static class AppInstaller
 {
-    /// <summary>
-    /// The registration details of this example are not significant to the solution 
-    /// </summary>
-    public class AppInstaller : IWindsorInstaller
+    public static IServiceCollection AddGenerators(this IServiceCollection services)
     {
-        public void Install(IWindsorContainer container, IConfigurationStore store)
+        services.AddTransient<IRange>(_ => new Range(0, 100));
+
+        services.AddTransient<ReverseEvenNumberGenerator>();
+
+        services.AddTransient<Class1>(_ =>
         {
-            container.Register(
-                Component.For<IRange>().UsingFactoryMethod(() => new Range(0, 100)),
+            var instance = new Class1();
+            instance.SetRange(0, 100);
+            return instance;
+        });
 
-                Component.For<IOutputGenerator, ReverseEvenNumberGenerator>()
-                    .ImplementedBy<ReverseEvenNumberGenerator>(),
+        services.AddTransient<OddNumberGenerator>(provider =>
+            new OddNumberGenerator { Range = provider.GetRequiredService<IRange>() });
 
-                Component.For<IOutputGenerator, Class1>()
-                    .ImplementedBy<Class1>()
-                    .OnCreate((kernel, instance) => ((Class1)instance).SetRange(0, 100)),
-
-                Component.For<IOutputGenerator, OddNumberGenerator>()
-                    .ImplementedBy<OddNumberGenerator>()
-                );
-        }
+        return services;
     }
 }
